@@ -19,7 +19,6 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

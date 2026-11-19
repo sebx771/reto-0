@@ -127,7 +127,7 @@ class TaskAppTests(unittest.TestCase):
             "/register", {"username": "alice", "password": "short"}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("al menos 8 caracteres".encode(), response.data)
+        self.assertIn(b"al menos 8 caracteres", response.data)
 
 
 if __name__ == "__main__":
