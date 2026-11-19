@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-intro">
+      <span class="eyebrow">TU ESPACIO, A TU RITMO</span>
+      <h1>Menos pendientes.<br><span>Más claridad.</span></h1>
+      <p>Un lugar sencillo para ordenar tus ideas, enfocarte en lo importante y celebrar cada cosa que completas.</p>
+      <div class="decorative-note"><span aria-hidden="true">✦</span> Hoy es un buen día para empezar.</div>
+    </div>
+    <div class="auth-card">
+      <div class="card-icon" aria-hidden="true">↗</div>
+      <h2>Qué bueno verte</h2>
+      <p class="muted">Inicia sesión para continuar con tus tareas.</p>
+      <form method="post" class="form-stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="username">Nombre de usuario</label>
+        <input id="username" name="username" type="text" autocomplete="username" maxlength="30" required autofocus>
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button button-primary button-full" type="submit">Iniciar sesión <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">¿Todavía no tienes cuenta? <a href="{{ url_for('register') }}">Regístrate</a></p>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Mis tareas{% endblock %}
+{% block content %}
+  <section class="dashboard">
+    <div class="dashboard-heading">
+      <div>
+        <span class="eyebrow">TU ESPACIO PERSONAL</span>
+        <h1>Mis tareas<span class="heading-dot">.</span></h1>
+        <p class="muted">Cada pequeño paso también cuenta.</p>
+      </div>
+      <div class="task-count">
+        <span class="count-number">{{ tasks|selectattr('completed', 'equalto', 0)|list|length }}</span>
+        <span class="count-label">por completar</span>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <section class="panel task-form-panel">
+        <div class="panel-heading">
+          <div class="panel-icon" aria-hidden="true">{% if editing_task %}✎{% else %}+{% endif %}</div>
+          <div>
+            <h2>{% if editing_task %}Editar tarea{% else %}Añade una tarea{% endif %}</h2>
+            <p class="muted">{% if editing_task %}Haz los cambios que necesites.{% else %}Saca una idea de tu cabeza y ponla en marcha.{% endif %}</p>
+          </div>
+        </div>
+        <form method="post" action="{% if editing_task %}{{ url_for('edit_task', task_id=editing_task['id']) }}{% else %}{{ url_for('create_task') }}{% endif %}" class="form-stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label for="title">Título</label>
+          <input id="title" name="title" type="text" maxlength="120" placeholder="Por ejemplo: preparar presentación" value="{{ editing_task['title'] if editing_task else '' }}" required autofocus>
+          <label for="description">Descripción <span class="optional">(opcional)</span></label>
+          <textarea id="description" name="description" maxlength="1000" rows="4" placeholder="Agrega algunos detalles...">{{ editing_task['description'] if editing_task else '' }}</textarea>
+          <button class="button button-primary button-full" type="submit">{% if editing_task %}Guardar cambios{% else %}Añadir a mi lista{% endif %} <span aria-hidden="true">→</span></button>
+          {% if editing_task %}<a class="cancel-link" href="{{ url_for('tasks') }}">Cancelar edición</a>{% endif %}
+        </form>
+      </section>
+
+      <section class="task-column">
+        <div class="list-heading">
+          <h2>Tu lista</h2>
+          <span class="list-total">{{ tasks|length }} {% if tasks|length == 1 %}tarea{% else %}tareas{% endif %}</span>
+        </div>
+        {% if tasks %}
+          <div class="task-list">
+            {% for task in tasks %}
+              <article class="task-card {% if task['completed'] %}is-complete{% endif %}">
+                <form class="complete-form" method="post" action="{{ url_for('toggle_task', task_id=task['id']) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="check-button" type="submit" aria-label="{% if task['completed'] %}Marcar como pendiente{% else %}Completar{% endif %} {{ task['title'] }}">
+                    {% if task['completed'] %}<span aria-hidden="true">✓</span>{% endif %}
+                  </button>
+                </form>
+                <div class="task-content">
+                  <h3>{{ task['title'] }}</h3>
+                  {% if task['description'] %}<p>{{ task['description'] }}</p>{% endif %}
+                </div>
+                <div class="task-actions">
+                  <a class="icon-button" href="{{ url_for('edit_task', task_id=task['id']) }}" aria-label="Editar {{ task['title'] }}" title="Editar">✎</a>
+                  <form method="post" action="{{ url_for('delete_task', task_id=task['id']) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="icon-button delete-button" type="submit" aria-label="Eliminar {{ task['title'] }}" title="Eliminar">×</button>
+                  </form>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-illustration" aria-hidden="true"><span>✓</span></div>
+            <h3>{% if editing_task %}Aún no hay otras tareas{% else %}Tu lista está despejada{% endif %}</h3>
+            <p>{% if editing_task %}Cuando crees tareas, aparecerán aquí.{% else %}Agrega tu primera tarea y empieza con algo pequeño.{% endif %}</p>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  </section>
+{% endblock %}
