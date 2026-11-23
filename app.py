@@ -46,6 +46,7 @@ def create_app(test_config=None):
             "DATABASE", str(Path(app.instance_path) / "tasks.sqlite")
         ),
         SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "1") == "1",
         SESSION_COOKIE_SAMESITE="Lax",
     )
     if test_config:
@@ -81,7 +82,7 @@ def create_app(test_config=None):
             submitted_token = request.form.get("csrf_token", "")
             session_token = session.get("csrf_token", "")
             if not session_token or not hmac.compare_digest(
-                submitted_token, session_token
+                submitted_token.encode("utf-8"), session_token.encode("utf-8")
             ):
                 abort(400, description="Token de seguridad inválido.")
 
@@ -123,6 +124,8 @@ def create_app(test_config=None):
                 error = "El usuario no puede contener espacios."
             elif len(password) < 8:
                 error = "La contraseña debe tener al menos 8 caracteres."
+            elif len(password) > 256:
+                error = "La contraseña no puede superar los 256 caracteres."
 
             if error is None:
                 try:
